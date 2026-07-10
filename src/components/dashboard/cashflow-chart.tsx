@@ -39,7 +39,7 @@ export function CashflowChart() {
               fontSize: 12,
               color: "var(--popover-foreground)",
             }}
-            formatter={(v: number) => formatCurrency(v)}
+            formatter={(v) => formatCurrency(Number(v))}
           />
           <Area type="monotone" dataKey="net" name="Net cashflow" stroke="var(--primary)" strokeWidth={2} fill="url(#netFill)" />
         </AreaChart>

@@ -42,7 +42,7 @@ export function CategoryDonut() {
                 fontSize: 12,
                 color: "var(--popover-foreground)",
               }}
-              formatter={(v: number) => formatCurrency(v)}
+              formatter={(v) => formatCurrency(Number(v))}
             />
           </PieChart>
         </ResponsiveContainer>

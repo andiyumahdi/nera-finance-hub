@@ -34,7 +34,7 @@ export function IncomeExpenseBars() {
               fontSize: 12,
               color: "var(--popover-foreground)",
             }}
-            formatter={(v: number) => formatCurrency(v)}
+            formatter={(v) => formatCurrency(Number(v))}
           />
           <Legend iconType="circle" wrapperStyle={{ fontSize: 12, color: "var(--muted-foreground)" }} />
           <Bar dataKey="income" name="Income" fill="var(--income)" radius={[4, 4, 0, 0]} maxBarSize={28} />
