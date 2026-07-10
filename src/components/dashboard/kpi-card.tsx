@@ -19,8 +19,8 @@ export function KpiCard({
     <Card className="shadow-none">
       <CardContent className="p-5">
         <div className="text-xs font-medium text-muted-foreground">{label}</div>
-        <div className="mt-2 flex items-baseline justify-between gap-2">
-          <div className="truncate text-2xl font-semibold tracking-tight">{value}</div>
+        <div className="mt-2 flex items-baseline justify-between gap-2 flex-wrap">
+          <div className="text-2xl font-semibold tracking-tight">{value}</div>
           {delta && (
             <span
               className={cn(
