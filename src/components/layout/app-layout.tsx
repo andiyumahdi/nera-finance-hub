@@ -13,11 +13,18 @@ export function AppLayout({
   children: ReactNode;
 }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "13rem",
+          "--sidebar-width-icon": "3rem",
+        } as React.CSSProperties
+      }
+    >
       <AppSidebar />
       <SidebarInset>
         <Topbar title={title} subtitle={subtitle} />
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <main className="flex-1 p-5 sm:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );
