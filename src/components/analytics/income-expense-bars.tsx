@@ -16,8 +16,8 @@ export function IncomeExpenseBars() {
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={monthlyCashflow} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-          <CartesianGrid stroke="var(--border)" vertical={false} />
-          <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+          <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} opacity={0.6} />
+          <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} dy={6} />
           <YAxis
             stroke="var(--muted-foreground)"
             fontSize={11}
@@ -36,9 +36,9 @@ export function IncomeExpenseBars() {
             }}
             formatter={(v) => formatCurrency(Number(v))}
           />
-          <Legend iconType="circle" wrapperStyle={{ fontSize: 12, color: "var(--muted-foreground)" }} />
-          <Bar dataKey="income" name="Income" fill="var(--income)" radius={[4, 4, 0, 0]} maxBarSize={28} />
-          <Bar dataKey="expense" name="Expense" fill="var(--expense)" radius={[4, 4, 0, 0]} maxBarSize={28} />
+          <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: "var(--muted-foreground)", paddingTop: 8 }} />
+          <Bar dataKey="income" name="Income" fill="var(--income)" radius={[3, 3, 0, 0]} maxBarSize={18} />
+          <Bar dataKey="expense" name="Expense" fill="var(--expense)" radius={[3, 3, 0, 0]} maxBarSize={18} />
         </BarChart>
       </ResponsiveContainer>
     </div>

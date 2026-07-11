@@ -3,10 +3,10 @@ import { ArrowUpRight } from "lucide-react";
 import { AppLayout } from "@/components/layout/app-layout";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { CashflowChart } from "@/components/dashboard/cashflow-chart";
+import { NeraInsight } from "@/components/dashboard/nera-insight";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { budgets, kpis, transactions } from "@/lib/mock-data";
 import { formatCurrency, formatDelta } from "@/lib/format";
 import { format } from "date-fns";
@@ -28,8 +28,10 @@ function DashboardPage() {
   const recent = transactions.slice(0, 5);
   return (
     <AppLayout title="Dashboard" subtitle="Overview of your finances this month">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <NeraInsight />
+
+        <section className="grid grid-cols-2 gap-5 xl:grid-cols-4">
           <KpiCard
             label="Net worth"
             value={formatCurrency(kpis.netWorth)}
@@ -60,14 +62,14 @@ function DashboardPage() {
           />
         </section>
 
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <Card className="shadow-none lg:col-span-2">
-            <CardHeader className="flex flex-row items-start justify-between space-y-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
-                <CardTitle className="text-sm font-semibold">Net cashflow</CardTitle>
-                <p className="text-xs text-muted-foreground">Last 6 months</p>
+                <CardTitle className="text-[13px] font-medium">Net cashflow</CardTitle>
+                <p className="text-[11px] text-muted-foreground">Last 6 months</p>
               </div>
-              <Badge variant="secondary" className="font-normal">Monthly</Badge>
+              <span className="text-[11px] text-muted-foreground">Monthly</span>
             </CardHeader>
             <CardContent>
               <CashflowChart />
@@ -75,25 +77,25 @@ function DashboardPage() {
           </Card>
 
           <Card className="shadow-none">
-            <CardHeader className="flex flex-row items-start justify-between space-y-0">
-              <CardTitle className="text-sm font-semibold">Budgets</CardTitle>
-              <Button variant="ghost" size="sm" className="h-7 text-xs">
-                Manage <ArrowUpRight className="ml-1 h-3 w-3" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-[13px] font-medium">Budgets</CardTitle>
+              <Button variant="ghost" size="sm" className="h-6 px-1 text-[11px] text-muted-foreground">
+                Manage <ArrowUpRight className="ml-0.5 h-3 w-3" />
               </Button>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               {budgets.map((b) => {
                 const pct = Math.min(100, (b.spent / b.limit) * 100);
                 const over = b.spent > b.limit;
                 return (
                   <div key={b.category}>
-                    <div className="flex items-baseline justify-between text-sm">
-                      <span className="font-medium">{b.category}</span>
-                      <span className={cn("font-mono text-xs tabular-nums", over ? "text-expense" : "text-muted-foreground")}>
+                    <div className="flex items-baseline justify-between text-[13px]">
+                      <span>{b.category}</span>
+                      <span className={cn("text-[11px] tabular-nums", over ? "text-expense" : "text-muted-foreground")}>
                         {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
                       </span>
                     </div>
-                    <Progress value={pct} className="mt-1.5 h-1.5" />
+                    <Progress value={pct} className="mt-2 h-1" />
                   </div>
                 );
               })}
@@ -102,28 +104,28 @@ function DashboardPage() {
         </section>
 
         <Card className="shadow-none">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div>
-              <CardTitle className="text-sm font-semibold">Recent transactions</CardTitle>
-              <p className="text-xs text-muted-foreground">Latest activity across accounts</p>
+              <CardTitle className="text-[13px] font-medium">Recent transactions</CardTitle>
+              <p className="text-[11px] text-muted-foreground">Latest activity across accounts</p>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-xs">
-              View all <ArrowUpRight className="ml-1 h-3 w-3" />
+            <Button variant="ghost" size="sm" className="h-6 px-1 text-[11px] text-muted-foreground">
+              View all <ArrowUpRight className="ml-0.5 h-3 w-3" />
             </Button>
           </CardHeader>
           <CardContent className="pt-0">
-            <ul className="divide-y">
+            <ul className="divide-y divide-border/60">
               {recent.map((t) => (
-                <li key={t.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
+                <li key={t.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3.5">
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">{t.description}</div>
-                    <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="truncate text-[13px]">{t.description}</div>
+                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
                       <span>{format(new Date(t.date), "MMM d")}</span>
                       <span>·</span>
                       <span className="truncate">{t.category}</span>
                     </div>
                   </div>
-                  <div className={cn("font-mono text-sm tabular-nums", t.type === "income" ? "text-income" : "text-expense")}>
+                  <div className={cn("text-[13px] tabular-nums", t.type === "income" ? "text-income" : "text-expense")}>
                     {t.type === "income" ? "+" : "−"}{formatCurrency(t.amount)}
                   </div>
                 </li>

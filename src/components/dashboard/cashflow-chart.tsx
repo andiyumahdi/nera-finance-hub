@@ -1,7 +1,7 @@
 import {
-  Area,
-  AreaChart,
   CartesianGrid,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -14,15 +14,16 @@ export function CashflowChart() {
   return (
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={monthlyCashflow} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-          <defs>
-            <linearGradient id="netFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.18} />
-              <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid stroke="var(--border)" vertical={false} />
-          <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+        <LineChart data={monthlyCashflow} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+          <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} opacity={0.6} />
+          <XAxis
+            dataKey="month"
+            stroke="var(--muted-foreground)"
+            fontSize={11}
+            tickLine={false}
+            axisLine={false}
+            dy={6}
+          />
           <YAxis
             stroke="var(--muted-foreground)"
             fontSize={11}
@@ -41,8 +42,16 @@ export function CashflowChart() {
             }}
             formatter={(v) => formatCurrency(Number(v))}
           />
-          <Area type="monotone" dataKey="net" name="Net cashflow" stroke="var(--primary)" strokeWidth={2} fill="url(#netFill)" />
-        </AreaChart>
+          <Line
+            type="monotone"
+            dataKey="net"
+            name="Net cashflow"
+            stroke="var(--primary)"
+            strokeWidth={1.5}
+            dot={{ r: 2.5, strokeWidth: 0, fill: "var(--primary)" }}
+            activeDot={{ r: 4, strokeWidth: 0 }}
+          />
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );

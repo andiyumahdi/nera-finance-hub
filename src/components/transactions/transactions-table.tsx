@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -23,33 +22,34 @@ export function TransactionsTable({ items }: { items: Transaction[] }) {
 
   return (
     <>
-      <div className="hidden overflow-hidden rounded-lg border md:block">
+      <div className="hidden overflow-hidden rounded-xl border md:block">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[110px]">Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Account</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-[120px] px-5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Date</TableHead>
+              <TableHead className="px-5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Description</TableHead>
+              <TableHead className="px-5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Category</TableHead>
+              <TableHead className="px-5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Account</TableHead>
+              <TableHead className="px-5 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((t) => (
-              <TableRow key={t.id}>
-                <TableCell className="text-muted-foreground">
+              <TableRow key={t.id} className="border-border/60">
+                <TableCell className="px-5 py-4 text-[13px] text-muted-foreground tabular-nums">
                   {format(new Date(t.date), "MMM d")}
                 </TableCell>
-                <TableCell className="font-medium">{t.description}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className="font-normal">
+                <TableCell className="px-5 py-4 text-[13px]">{t.description}</TableCell>
+                <TableCell className="px-5 py-4">
+                  <span className="inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-transparent px-2 py-0.5 text-[11px] font-normal text-muted-foreground">
+                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60" />
                     {t.category}
-                  </Badge>
+                  </span>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{t.account}</TableCell>
+                <TableCell className="px-5 py-4 text-[13px] text-muted-foreground">{t.account}</TableCell>
                 <TableCell
                   className={cn(
-                    "text-right font-mono text-sm tabular-nums",
+                    "px-5 py-4 text-right text-[13px] tabular-nums",
                     t.type === "income" ? "text-income" : "text-expense",
                   )}
                 >
@@ -64,10 +64,10 @@ export function TransactionsTable({ items }: { items: Transaction[] }) {
 
       <div className="space-y-2 md:hidden">
         {items.map((t) => (
-          <div key={t.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-lg border bg-card p-3">
+          <div key={t.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-xl border border-border/70 bg-card p-4">
             <div className="min-w-0">
-              <div className="truncate text-sm font-medium">{t.description}</div>
-              <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="truncate text-[13px]">{t.description}</div>
+              <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
                 <span>{format(new Date(t.date), "MMM d")}</span>
                 <span>·</span>
                 <span className="truncate">{t.category}</span>
@@ -75,7 +75,7 @@ export function TransactionsTable({ items }: { items: Transaction[] }) {
             </div>
             <div
               className={cn(
-                "shrink-0 self-center font-mono text-sm tabular-nums",
+                "shrink-0 self-center text-[13px] tabular-nums",
                 t.type === "income" ? "text-income" : "text-expense",
               )}
             >
