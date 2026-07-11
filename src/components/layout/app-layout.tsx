@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { Topbar } from "./topbar";
@@ -18,7 +18,7 @@ export function AppLayout({
         {
           "--sidebar-width": "13rem",
           "--sidebar-width-icon": "3rem",
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       <AppSidebar />

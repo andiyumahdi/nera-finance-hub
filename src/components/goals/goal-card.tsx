@@ -1,45 +1,71 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/format";
 import type { Goal } from "@/lib/mock-data";
 import { format } from "date-fns";
 
 export function GoalCard({ goal }: { goal: Goal }) {
   const pct = Math.min(100, (goal.current / goal.target) * 100);
+  const size = 88;
+  const stroke = 6;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const dash = (pct / 100) * circumference;
   return (
     <Card className="shadow-none">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="truncate text-sm font-semibold">{goal.name}</h3>
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              {goal.category}
+            </p>
+            <h3 className="mt-1 truncate text-[15px] font-medium">{goal.name}</h3>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
               Target {format(new Date(goal.deadline), "MMM yyyy")}
             </p>
           </div>
-          <Badge variant="secondary" className="shrink-0 font-normal">
-            {goal.category}
-          </Badge>
+          <div className="relative shrink-0" style={{ width: size, height: size }}>
+            <svg width={size} height={size} className="-rotate-90">
+              <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                stroke="var(--border)"
+                strokeWidth={stroke}
+                fill="none"
+              />
+              <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                stroke="var(--primary)"
+                strokeWidth={stroke}
+                strokeLinecap="round"
+                fill="none"
+                strokeDasharray={`${dash} ${circumference}`}
+              />
+            </svg>
+            <div className="absolute inset-0 grid place-items-center">
+              <span className="text-sm font-medium tabular-nums">{pct.toFixed(0)}%</span>
+            </div>
+          </div>
         </div>
-        <div className="mt-4">
-          <div className="flex items-baseline justify-between">
-            <div className="font-mono text-lg font-semibold tabular-nums">
+        <div className="mt-6 flex items-baseline justify-between border-t border-border/60 pt-4">
+          <div>
+            <div className="text-lg font-semibold tabular-nums tracking-tight">
               {formatCurrency(goal.current)}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-[11px] text-muted-foreground">
               of {formatCurrency(goal.target)}
             </div>
           </div>
-          <Progress value={pct} className="mt-2 h-1.5" />
-          <div className="mt-2 flex justify-between text-xs text-muted-foreground">
-            <span>{pct.toFixed(0)}% funded</span>
-            <span>{formatCurrency(goal.target - goal.current)} to go</span>
+          <div className="text-right text-[11px] text-muted-foreground">
+            {formatCurrency(goal.target - goal.current)} to go
           </div>
         </div>
         <div className="mt-4 flex gap-2">
-          <Button size="sm" className="flex-1">Contribute</Button>
-          <Button size="sm" variant="outline">Edit</Button>
+          <Button size="sm" variant="outline" className="flex-1">Contribute</Button>
+          <Button size="sm" variant="ghost">Edit</Button>
         </div>
       </CardContent>
     </Card>

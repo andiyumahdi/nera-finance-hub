@@ -23,14 +23,14 @@ function GoalsPage() {
   const target = goals.reduce((a, g) => a + g.target, 0);
   return (
     <AppLayout title="Goals" subtitle={`${goals.length} active`}>
-      <div className="mx-auto max-w-7xl space-y-6">
+      <div className="mx-auto max-w-7xl space-y-8">
         <Card className="shadow-none">
           <CardContent className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 p-5 sm:flex sm:justify-between">
             <div className="min-w-0">
-              <p className="text-xs font-medium text-muted-foreground">Total saved toward goals</p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Total saved toward goals</p>
+              <p className="mt-2 text-xl font-semibold tabular-nums tracking-tight">
                 {formatCurrency(total)}
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                <span className="ml-2 text-[13px] font-normal text-muted-foreground">
                   of {formatCurrency(target)}
                 </span>
               </p>
@@ -39,7 +39,7 @@ function GoalsPage() {
           </CardContent>
         </Card>
 
-        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {goals.map((g) => (
             <GoalCard key={g.id} goal={g} />
           ))}
