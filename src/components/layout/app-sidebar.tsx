@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -6,7 +6,18 @@ import {
   Target,
   Settings,
   Sparkles,
+  LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import {
   Sidebar,
@@ -37,6 +48,19 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const initials =
+    (user?.firstName?.[0] ?? "") + (user?.lastName?.[0] ?? "") || "N";
+  const fullName = user ? `${user.firstName} ${user.lastName}` : "Guest";
+  const email = user?.email ?? "";
+
+  const handleSignOut = () => {
+    signOut();
+    toast.success("Signed out");
+    navigate({ to: "/login", replace: true });
+  };
 
   const renderItem = (item: { title: string; url: string; icon: typeof LayoutDashboard }) => {
     const active = pathname === item.url || pathname.startsWith(item.url + "/");
@@ -96,17 +120,41 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center gap-2 rounded-md px-2 py-2">
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-            AM
-          </div>
-          {!collapsed && (
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate text-sm font-medium">Alex Morgan</span>
-              <span className="truncate text-[11px] text-muted-foreground">alex@nera.app</span>
-            </div>
-          )}
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-sidebar-accent/60">
+              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted text-[11px] font-semibold uppercase text-muted-foreground">
+                {initials}
+              </div>
+              {!collapsed && (
+                <div className="flex min-w-0 flex-col leading-tight">
+                  <span className="truncate text-sm font-medium">{fullName}</span>
+                  <span className="truncate text-[11px] text-muted-foreground">
+                    {email}
+                  </span>
+                </div>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="right" align="end" className="w-56">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col">
+                <span className="text-[13px] font-medium">{fullName}</span>
+                <span className="text-[11.5px] text-muted-foreground">{email}</span>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate({ to: "/settings" })}>
+              <Settings className="h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   );
