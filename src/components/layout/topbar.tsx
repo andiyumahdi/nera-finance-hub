@@ -1,8 +1,8 @@
-import { Bell, Search } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "./theme-toggle";
+import { NotificationCenter } from "./notification-center";
+import { UserMenu } from "./user-menu";
+import { GlobalSearch } from "./global-search";
 
 export function Topbar({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
@@ -16,15 +16,11 @@ export function Topbar({ title, subtitle }: { title: string; subtitle?: string }
           )}
         </div>
       </div>
-      <div className="relative hidden md:block">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input placeholder="Search transactions, categories…" className="h-9 max-w-md pl-9" />
-      </div>
+      <GlobalSearch />
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" aria-label="Notifications">
-          <Bell className="h-4 w-4" />
-        </Button>
+        <NotificationCenter />
         <ThemeToggle />
+        <UserMenu />
       </div>
     </header>
   );
