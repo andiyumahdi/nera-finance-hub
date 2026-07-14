@@ -1,92 +1,81 @@
-# Nera — Premium Personal Finance Dashboard
+# MVP v1.0 Polish Sprint
 
-A calm, minimal finance dashboard inspired by Linear / Stripe / Vercel / Notion. Indigo primary, neutral grays, green for income, red for expense. Light + dark mode. Fully responsive.
+Preserve the existing visual language (colors, spacing, typography, radii, components). No redesign — only wire up interactions, states, and data-readiness.
 
-Note: this project runs on TanStack Start (not Next.js), but the design principles and shadcn/ui approach translate 1:1. All routing uses TanStack Router's file-based routes under `src/routes/`.
+## 1. Navbar interactions
 
-## Design system
+**Notification Center** (`src/components/layout/notification-center.tsx`, new)
+- Bell icon → `DropdownMenu` (Popover) with list of notifications.
+- Types: `weekly_summary`, `budget_alert`, `goal_progress`, `transaction_synced`.
+- Unread dot badge on the bell when `unread > 0`.
+- "Mark all as read" action + empty state ("You're all caught up").
+- Backed by a small `useNotifications` hook with in-memory mock list; shape ready to swap for an API call.
 
-Update `src/styles.css` tokens (oklch):
-- `--primary`: Indigo #4F46E5
-- Neutral gray surfaces: near-white bg + subtle borders (light); near-black bg with slightly elevated cards (dark)
-- Add semantic tokens: `--income` (green ~ oklch(0.65 0.17 150)), `--expense` (red ~ oklch(0.60 0.22 25)), plus `-foreground` pairs
-- Register them in `@theme inline` so `bg-income` / `text-expense` work
-- Radius 0.5rem, tight typography scale, no gradients/shadows beyond subtle `ring-1 ring-border`
-- Font: Inter via `<link>` in `__root.tsx` head
+**User Menu** — move avatar/user dropdown from sidebar footer into the topbar too, keep sidebar version. Menu items: Profile (routes to `/settings`), Settings, Help (external link placeholder), Logout.
+- Logout opens an `AlertDialog` confirmation before clearing session; on confirm → toast "Signed out" → redirect to `/login`.
 
-Dark mode toggle: `next-themes`-style, but implemented with a small `ThemeProvider` that toggles `.dark` on `<html>`, persisted in `localStorage`. Read inside `useEffect` to avoid hydration mismatch.
+## 2. Global Search
+- Debounced input (250ms), controlled state.
+- Loading spinner while "searching", empty result state, `X` clear button, focus ring, `⌘K` hint.
+- Uses `useDebouncedValue` hook + local mock query fn (ready to swap).
+- Results dropdown grouped by transactions/goals/pages.
 
-## Routes (`src/routes/`)
+## 3. Empty / Loading / Error States
+Reusable primitives in `src/components/state/`:
+- `<EmptyState icon title description action />`
+- `<ErrorState title description onRetry />`
+- `<Skeleton>` (already in shadcn) + composed skeletons: `DashboardSkeleton`, `TransactionsTableSkeleton`, `AnalyticsSkeleton`, `GoalsSkeleton`, `SettingsSkeleton`.
 
+Wire each route to accept data via props/hooks (`useDashboardData`, `useTransactions`, etc.) that return `{ data, isLoading, error, refetch }`. Current mock data flows through these hooks so the UI is data-shape-ready.
+
+## 4. Auth flow completion
+- Route protection: `_authenticated`-style guard already via `AuthGate`. Add reverse guard on `/login` and `/register` → redirect authenticated users to `/dashboard`.
+- Session-expired toast on redirect (already scaffolded via `?expired=1`).
+- Add `/verify-email` placeholder route.
+- Google button: loading state → toast "Welcome back" → smooth navigate to `/dashboard`. Error surfaces via inline alert.
+- Logout confirmation dialog (see §1).
+
+## 5. Toasts
+Consistent sonner usage: login success ("Welcome back, {name}"), logout, profile updated, settings saved, transaction/goal CRUD (mock handlers). Standardize on `toast.success` / `toast.error` with short messages.
+
+## 6. Theme persistence
+Verify `ThemeProvider` persists to localStorage under `nera-theme` (already does via inline script + provider). Add explicit `system` handling watcher for OS-level changes.
+
+## 7. Data-readiness
+Introduce `src/lib/data-hooks.ts` — mock async hooks matching future API shape:
 ```
-__root.tsx              → shell + <AppLayout>
-index.tsx               → redirects to /dashboard (or serves dashboard)
-dashboard.tsx           → Overview
-transactions.tsx        → Transactions
-analytics.tsx           → Analytics
-goals.tsx               → Goals
-settings.tsx            → Settings (with sub-tabs)
+useDashboardData() → { kpis, cashflow, budgets, recent }
+useTransactionsData(filters) → { items, total }
+useAnalyticsData() → { categories, incomeExpense, kpis }
+useGoalsData() → { goals }
+useProfile() → { user }
 ```
+Each simulates a delay + can toggle error state for demo. Components read from hooks, not from imports of `mock-data.ts` directly.
 
-Each route sets its own `head()` with unique title + description + og tags.
+## 8. Polish
+- Focus-visible rings on interactive elements (use `focus-visible:ring-2 ring-ring/50`).
+- Loading button states (`<Button disabled>` + spinner) on all form submits.
+- Smooth page transitions: subtle `animate-in fade-in-0` on route content.
+- Consistent hover/active states audit on cards, table rows, sidebar items.
 
-## Layout
+## Files to add
+- `src/components/layout/notification-center.tsx`
+- `src/components/layout/user-menu.tsx`
+- `src/components/layout/global-search.tsx`
+- `src/components/state/empty-state.tsx`
+- `src/components/state/error-state.tsx`
+- `src/components/state/skeletons.tsx`
+- `src/hooks/use-debounced-value.ts`
+- `src/hooks/use-notifications.ts`
+- `src/lib/data-hooks.ts`
+- `src/routes/verify-email.tsx`
 
-`src/components/layout/AppLayout.tsx` using shadcn Sidebar:
-- Desktop: collapsible icon sidebar (left) with Nera wordmark, nav (Dashboard, Transactions, Analytics, Goals, Settings), user card at bottom
-- Mobile: sidebar becomes off-canvas via `SidebarTrigger` in a slim top bar; top bar also holds page title, search, theme toggle, notifications
-- Uses `grid-cols-[minmax(0,1fr)_auto]` responsive header pattern
+## Files to edit
+- `src/components/layout/topbar.tsx` — mount notification center, user menu, wired search.
+- `src/routes/{dashboard,transactions,analytics,goals,settings}.tsx` — consume data hooks, render skeletons/empty/error.
+- `src/routes/{login,register}.tsx` — reverse guard, Google flow polish, welcome toast.
+- `src/components/layout/app-sidebar.tsx` — logout confirmation.
+- `src/components/theme-provider.tsx` — verify system watcher.
 
-## Page content
-
-**Dashboard Overview**
-- 4 KPI cards: Net Worth, Monthly Income (green delta), Monthly Expense (red delta), Savings Rate
-- Cashflow area chart (last 6 months) — Recharts, single indigo line + muted grid
-- Recent transactions list (5 rows)
-- Budget progress list (3–4 categories with thin progress bars)
-
-**Transactions**
-- Filter bar: search, date range, category multiselect, type (income/expense)
-- Table (shadcn Table) with columns: Date, Description, Category (badge), Account, Amount (colored)
-- Pagination footer; empty + loading states
-- Mobile: table collapses into stacked cards
-
-**Analytics**
-- Income vs Expense bar chart (monthly, grouped)
-- Spending by category donut + legend list with % and amount
-- Trend line: Savings over time
-- Small KPI strip on top
-
-**Goals**
-- Grid of goal cards: title, target, current, progress bar, ETA, contribute button
-- "New goal" primary button opens a Dialog with form (name, target amount, deadline, category)
-- Empty state illustration (simple, no gradients)
-
-**Settings**
-- Tabs: Profile, Preferences, Notifications, Security, Billing
-- Preferences includes Appearance (Light / Dark / System) radio group and Currency select
-- Forms use shadcn Form + Input + Switch + Button
-
-All data is mock/static (typed in `src/lib/mock-data.ts`) — no backend in this pass.
-
-## Components to add
-
-- `components/layout/AppSidebar.tsx`
-- `components/layout/Topbar.tsx`
-- `components/layout/ThemeToggle.tsx` + `components/theme-provider.tsx`
-- `components/dashboard/KpiCard.tsx`
-- `components/dashboard/CashflowChart.tsx`
-- `components/transactions/TransactionsTable.tsx` + `TransactionRow.tsx`
-- `components/analytics/CategoryDonut.tsx`, `IncomeExpenseBars.tsx`
-- `components/goals/GoalCard.tsx`, `NewGoalDialog.tsx`
-- `lib/mock-data.ts`, `lib/format.ts` (currency, %, delta helpers)
-
-Install: `recharts`, `date-fns`. shadcn primitives already available (add any missing: sidebar, table, tabs, dialog, dropdown-menu, badge, progress, select, switch, form).
-
-## Technical notes
-
-- All colors via semantic tokens — no hardcoded hex in components
-- Sidebar wrapped in `SidebarProvider` inside `__root.tsx` so `SidebarTrigger` always visible on mobile
-- Charts use CSS variables for colors so they follow light/dark automatically
-- Every page route has distinct `head()` metadata (title, description, og:title, og:description); no og:image
-- Placeholder in `src/routes/index.tsx` removed
+## Out of scope
+No redesign. No new features beyond above. No backend/Supabase integration yet — hooks are shaped for it.
