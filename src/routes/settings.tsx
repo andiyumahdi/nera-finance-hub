@@ -1,5 +1,7 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/components/layout/app-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTheme } from "@/components/theme-provider";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -54,30 +57,83 @@ function SettingsGroup({
 
 function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
+  const [firstName, setFirstName] = useState(user?.firstName ?? "");
+  const [lastName, setLastName] = useState(user?.lastName ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [saving, setSaving] = useState(false);
+  const [savingPw, setSavingPw] = useState(false);
+
+  const initials =
+    ((firstName?.[0] ?? "") + (lastName?.[0] ?? "")).toUpperCase() || "N";
+
+  const onSaveProfile = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    setSaving(true);
+    await new Promise((r) => setTimeout(r, 600));
+    setSaving(false);
+    toast.success("Profile updated");
+  };
+
+  const onSavePassword = async () => {
+    setSavingPw(true);
+    await new Promise((r) => setTimeout(r, 600));
+    setSavingPw(false);
+    toast.success("Password updated");
+  };
 
   return (
     <AppLayout title="Settings" subtitle="Manage your account and preferences">
       <div className="mx-auto max-w-4xl space-y-10">
         <SettingsGroup title="Profile" description="Your personal details and how we reach you.">
-          <div className="space-y-4">
+          <form className="space-y-4" onSubmit={onSaveProfile}>
+            <div className="flex items-center gap-4">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-primary/10 text-[15px] font-semibold text-primary">
+                {initials}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-[13px] font-medium">
+                  {firstName || "Guest"} {lastName}
+                </p>
+                <p className="truncate text-[11.5px] text-muted-foreground">
+                  {email || "no email"}
+                </p>
+              </div>
+            </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="s-first" className="text-[12px]">First name</Label>
-                <Input id="s-first" defaultValue="Alex" />
+                <Input
+                  id="s-first"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="s-last" className="text-[12px]">Last name</Label>
-                <Input id="s-last" defaultValue="Morgan" />
+                <Input
+                  id="s-last"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="s-email" className="text-[12px]">Email</Label>
-              <Input id="s-email" type="email" defaultValue="alex@nera.app" />
+              <Input
+                id="s-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="flex justify-end pt-1">
-              <Button size="sm">Save changes</Button>
+              <Button type="submit" size="sm" disabled={saving}>
+                {saving && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                {saving ? "Saving…" : "Save changes"}
+              </Button>
             </div>
-          </div>
+          </form>
         </SettingsGroup>
 
         <SettingsGroup title="Appearance" description="Pick how Nera looks to you across sessions.">
@@ -161,7 +217,16 @@ function SettingsPage() {
               <Input id="pw" type="password" placeholder="New password" />
             </div>
             <div className="flex justify-end">
-              <Button size="sm">Update password</Button>
+              <Button
+                size="sm"
+                onClick={onSavePassword}
+                disabled={savingPw}
+              >
+                {savingPw && (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                )}
+                {savingPw ? "Updating…" : "Update password"}
+              </Button>
             </div>
           </div>
         </SettingsGroup>
