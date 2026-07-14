@@ -76,7 +76,7 @@ function RegisterPage() {
     try {
       await signUp({ firstName, lastName, email, password });
       toast.success("Account created", {
-        description: "Welcome to Nera.",
+        description: `Welcome to Nera, ${firstName}.`,
       });
       navigate({ to: "/dashboard", replace: true });
     } catch (err) {
@@ -91,9 +91,13 @@ function RegisterPage() {
 
   const onGoogle = async () => {
     setGoogleLoading(true);
+    setFormError(null);
     try {
       await signInWithGoogle();
+      toast.success("Welcome to Nera", { description: "Signed in with Google" });
       navigate({ to: "/dashboard", replace: true });
+    } catch {
+      setFormError("We couldn't sign you in with Google. Please try again.");
     } finally {
       setGoogleLoading(false);
     }
