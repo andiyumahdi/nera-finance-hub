@@ -66,6 +66,14 @@ function LoginPage() {
     }
   }, [user, navigate, redirect]);
 
+  useEffect(() => {
+    if (expired) {
+      toast.error("Session expired", {
+        description: "Please sign in again to continue.",
+      });
+    }
+  }, [expired]);
+
   const validate = () => {
     const e: typeof errors = {};
     if (!email) e.email = "Email is required.";
@@ -83,9 +91,7 @@ function LoginPage() {
     setLoading(true);
     try {
       await signIn(email, password);
-      toast.success("Welcome back", {
-        description: "Signing you in…",
-      });
+      toast.success(`Welcome back${email ? `, ${email.split("@")[0]}` : ""}`);
       navigate({ to: redirect ?? "/dashboard", replace: true });
     } catch (err) {
       const code = (err as Error & { code?: string }).code;
@@ -100,10 +106,13 @@ function LoginPage() {
 
   const onGoogle = async () => {
     setGoogleLoading(true);
+    setFormError(null);
     try {
       await signInWithGoogle();
-      toast.success("Signed in with Google");
+      toast.success("Welcome back", { description: "Signed in with Google" });
       navigate({ to: redirect ?? "/dashboard", replace: true });
+    } catch {
+      setFormError("We couldn't sign you in with Google. Please try again.");
     } finally {
       setGoogleLoading(false);
     }

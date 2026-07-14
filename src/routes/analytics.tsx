@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { BarChart3 } from "lucide-react";
 import { AppLayout } from "@/components/layout/app-layout";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +7,10 @@ import { CategoryDonut } from "@/components/analytics/category-donut";
 import { IncomeExpenseBars } from "@/components/analytics/income-expense-bars";
 import { CashflowChart } from "@/components/dashboard/cashflow-chart";
 import { formatCurrency, formatDelta } from "@/lib/format";
-import { kpis } from "@/lib/mock-data";
+import { useAnalyticsData } from "@/lib/data-hooks";
+import { AnalyticsSkeleton } from "@/components/state/skeletons";
+import { ErrorState } from "@/components/state/error-state";
+import { EmptyState } from "@/components/state/empty-state";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({
@@ -21,6 +25,46 @@ export const Route = createFileRoute("/analytics")({
 });
 
 function AnalyticsPage() {
+  const { data, isLoading, error, refetch } = useAnalyticsData();
+
+  if (isLoading) {
+    return (
+      <AppLayout title="Analytics" subtitle="Trends and category insights">
+        <div className="mx-auto max-w-7xl">
+          <AnalyticsSkeleton />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <AppLayout title="Analytics" subtitle="Trends and category insights">
+        <div className="mx-auto max-w-7xl">
+          <ErrorState
+            title="Unable to load analytics"
+            onRetry={refetch}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const { kpis, categories } = data;
+  if (categories.length === 0) {
+    return (
+      <AppLayout title="Analytics" subtitle="Trends and category insights">
+        <div className="mx-auto max-w-7xl">
+          <EmptyState
+            icon={BarChart3}
+            title="Not enough data yet"
+            description="Analytics unlock once you have a few weeks of transaction history."
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout title="Analytics" subtitle="Trends and category insights">
       <div className="mx-auto max-w-7xl space-y-8">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search, Download, Filter } from "lucide-react";
 import { AppLayout } from "@/components/layout/app-layout";
@@ -13,7 +13,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TransactionsTable } from "@/components/transactions/transactions-table";
-import { categories, transactions } from "@/lib/mock-data";
+import { useTransactionsData } from "@/lib/data-hooks";
+import { TransactionsTableSkeleton } from "@/components/state/skeletons";
+import { ErrorState } from "@/components/state/error-state";
+import { EmptyState } from "@/components/state/empty-state";
+import { Receipt } from "lucide-react";
 
 export const Route = createFileRoute("/transactions")({
   head: () => ({
@@ -32,17 +36,20 @@ function TransactionsPage() {
   const [type, setType] = useState<"all" | "income" | "expense">("all");
   const [category, setCategory] = useState<string>("all");
 
-  const filtered = useMemo(() => {
-    return transactions.filter((t) => {
-      if (type !== "all" && t.type !== type) return false;
-      if (category !== "all" && t.category !== category) return false;
-      if (q && !t.description.toLowerCase().includes(q.toLowerCase())) return false;
-      return true;
-    });
-  }, [q, type, category]);
+  const { data, isLoading, error, refetch } = useTransactionsData({
+    q,
+    type,
+    category,
+  });
+  const filtered = data?.items ?? [];
+  const categories = data?.categories ?? [];
+  const hasFilters = q !== "" || type !== "all" || category !== "all";
 
   return (
-    <AppLayout title="Transactions" subtitle={`${filtered.length} results`}>
+    <AppLayout
+      title="Transactions"
+      subtitle={isLoading ? "Loading…" : `${filtered.length} results`}
+    >
       <div className="mx-auto max-w-7xl space-y-4">
         <Card className="shadow-none">
           <CardContent className="p-4">
@@ -85,7 +92,36 @@ function TransactionsPage() {
           </CardContent>
         </Card>
 
-        <TransactionsTable items={filtered} />
+        {isLoading ? (
+          <TransactionsTableSkeleton />
+        ) : error ? (
+          <ErrorState
+            title="Unable to load transactions"
+            onRetry={refetch}
+          />
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon={Receipt}
+            title={hasFilters ? "No transactions found" : "No transactions yet"}
+            description={
+              hasFilters
+                ? "Try adjusting your filters or search terms."
+                : "Once your accounts sync, activity will show up here."
+            }
+            actionLabel={hasFilters ? "Clear filters" : undefined}
+            onAction={
+              hasFilters
+                ? () => {
+                    setQ("");
+                    setType("all");
+                    setCategory("all");
+                  }
+                : undefined
+            }
+          />
+        ) : (
+          <TransactionsTable items={filtered} />
+        )}
       </div>
     </AppLayout>
   );

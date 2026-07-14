@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ArrowUpRight, Receipt } from "lucide-react";
 import { AppLayout } from "@/components/layout/app-layout";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { CashflowChart } from "@/components/dashboard/cashflow-chart";
@@ -7,10 +7,13 @@ import { NeraInsight } from "@/components/dashboard/nera-insight";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { budgets, kpis, transactions } from "@/lib/mock-data";
 import { formatCurrency, formatDelta } from "@/lib/format";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useDashboardData } from "@/lib/data-hooks";
+import { DashboardSkeleton } from "@/components/state/skeletons";
+import { ErrorState } from "@/components/state/error-state";
+import { EmptyState } from "@/components/state/empty-state";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -25,7 +28,34 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const recent = transactions.slice(0, 5);
+  const { data, isLoading, error, refetch } = useDashboardData();
+  const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <AppLayout title="Dashboard" subtitle="Overview of your finances this month">
+        <div className="mx-auto max-w-7xl">
+          <DashboardSkeleton />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <AppLayout title="Dashboard" subtitle="Overview of your finances this month">
+        <div className="mx-auto max-w-7xl">
+          <ErrorState
+            title="Unable to load dashboard"
+            description="We couldn't fetch your latest data. Please try again."
+            onRetry={refetch}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const { kpis, budgets, recent } = data;
   return (
     <AppLayout title="Dashboard" subtitle="Overview of your finances this month">
       <div className="mx-auto max-w-7xl space-y-8">
@@ -109,11 +139,25 @@ function DashboardPage() {
               <CardTitle className="text-[13px] font-medium">Recent transactions</CardTitle>
               <p className="text-[11px] text-muted-foreground">Latest activity across accounts</p>
             </div>
-            <Button variant="ghost" size="sm" className="h-6 px-1 text-[11px] text-muted-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate({ to: "/transactions" })}
+              className="h-6 px-1 text-[11px] text-muted-foreground"
+            >
               View all <ArrowUpRight className="ml-0.5 h-3 w-3" />
             </Button>
           </CardHeader>
           <CardContent className="pt-0">
+            {recent.length === 0 ? (
+              <EmptyState
+                icon={Receipt}
+                title="No transactions yet"
+                description="Once your accounts sync, activity will show up here."
+                actionLabel="Go to transactions"
+                onAction={() => navigate({ to: "/transactions" })}
+              />
+            ) : (
             <ul className="divide-y divide-border/60">
               {recent.map((t) => (
                 <li key={t.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3.5">
@@ -131,6 +175,7 @@ function DashboardPage() {
                 </li>
               ))}
             </ul>
+            )}
           </CardContent>
         </Card>
       </div>
