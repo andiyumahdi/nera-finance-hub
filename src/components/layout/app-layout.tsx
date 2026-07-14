@@ -26,7 +26,9 @@ export function AppLayout({
       <AppSidebar />
       <SidebarInset>
         <Topbar title={title} subtitle={subtitle} />
-        <main className="flex-1 p-5 sm:p-8">{children}</main>
+        <main className="flex-1 p-5 sm:p-8 animate-in fade-in-0 duration-200">
+          {children}
+        </main>
       </SidebarInset>
       </SidebarProvider>
     </AuthGate>
