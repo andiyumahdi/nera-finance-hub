@@ -4,7 +4,15 @@ import { formatCurrency } from "@/lib/format";
 import type { Goal } from "@/lib/mock-data";
 import { format } from "date-fns";
 
-export function GoalCard({ goal }: { goal: Goal }) {
+export function GoalCard({
+  goal,
+  onEdit,
+  onContribute,
+}: {
+  goal: Goal;
+  onEdit?: (g: Goal) => void;
+  onContribute?: (g: Goal) => void;
+}) {
   const pct = Math.min(100, (goal.current / goal.target) * 100);
   const size = 88;
   const stroke = 6;
@@ -64,8 +72,18 @@ export function GoalCard({ goal }: { goal: Goal }) {
           </div>
         </div>
         <div className="mt-4 flex gap-2">
-          <Button size="sm" variant="outline" className="flex-1">Contribute</Button>
-          <Button size="sm" variant="ghost">Edit</Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="flex-1"
+            onClick={() => onContribute?.(goal)}
+            disabled={goal.current >= goal.target}
+          >
+            {goal.current >= goal.target ? "Completed" : "Contribute"}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => onEdit?.(goal)}>
+            Edit
+          </Button>
         </div>
       </CardContent>
     </Card>
