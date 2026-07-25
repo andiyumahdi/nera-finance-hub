@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "nera-mcp",
+      "version": "0.1.0",
+      "title": "Nera Finance MCP"
+    },
+    "tools": [
+      {
+        "name": "get_demo_transactions",
+        "title": "Get demo transactions",
+        "description": "Return sample Nera transactions (demo data, not tied to any user account). Useful for exploring the shape of the data.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Maximum number of transactions to return (default 8).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "type": {
+              "description": "Filter by transaction type.",
+              "type": "string",
+              "enum": [
+                "income",
+                "expense"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "summarize_spending",
+        "title": "Summarize spending",
+        "description": "Given a list of transactions (positive = income, negative = expense), return totals and per-category expense breakdown.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "transactions": {
+              "minItems": 1,
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "description": "Positive for income, negative for expense."
+                  },
+                  "category": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount"
+                ]
+              }
+            }
+          },
+          "required": [
+            "transactions"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "goal_projection",
+        "title": "Project savings goal",
+        "description": "Compute how many months are needed to reach a savings goal given a starting balance and monthly contribution, plus a simple month-by-month projection.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Target amount to reach."
+            },
+            "current": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Current saved amount."
+            },
+            "monthlyContribution": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Amount saved per month."
+            },
+            "annualInterestRate": {
+              "description": "Optional annual interest rate as a decimal (e.g. 0.04 = 4%).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "maxMonths": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            }
+          },
+          "required": [
+            "target",
+            "current",
+            "monthlyContribution"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
