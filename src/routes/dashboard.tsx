@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { CashflowChart } from "@/components/dashboard/cashflow-chart";
 import { NeraInsight } from "@/components/dashboard/nera-insight";
+import { WalletOverview } from "@/components/dashboard/wallet-overview";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { useDashboardData } from "@/lib/data-hooks";
 import { DashboardSkeleton } from "@/components/state/skeletons";
 import { ErrorState } from "@/components/state/error-state";
 import { EmptyState } from "@/components/state/empty-state";
+import { mockWallets } from "@/lib/wallet-mock";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
