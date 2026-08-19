@@ -8,6 +8,9 @@ import {
   Settings,
   Sparkles,
   LogOut,
+  Wallet,
+  PiggyBank,
+  Tags,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -53,6 +56,12 @@ const workspaceItems = [
 
 const accountItems = [
   { title: "Settings", url: "/settings", icon: Settings },
+] as const;
+
+const moneyItems = [
+  { title: "Wallets", url: "/wallets", icon: Wallet },
+  { title: "Budgets", url: "/budgets", icon: PiggyBank },
+  { title: "Categories", url: "/categories", icon: Tags },
 ] as const;
 
 export function AppSidebar() {
@@ -116,6 +125,18 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               {workspaceItems.map(renderItem)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup className="p-0">
+          {!collapsed && (
+            <SidebarGroupLabel className="px-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              Money
+            </SidebarGroupLabel>
+          )}
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1">
+              {moneyItems.map(renderItem)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
