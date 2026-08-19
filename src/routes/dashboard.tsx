@@ -94,6 +94,8 @@ function DashboardPage() {
           />
         </section>
 
+        <WalletOverview wallets={mockWallets} />
+
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <Card className="shadow-none lg:col-span-2">
 
