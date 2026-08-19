@@ -96,6 +96,7 @@ function DashboardPage() {
 
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <Card className="shadow-none lg:col-span-2">
+
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
                 <CardTitle className="text-[13px] font-medium">Net cashflow</CardTitle>
